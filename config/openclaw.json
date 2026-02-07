@@ -42,5 +42,10 @@
     "auth": {
       "mode": "token"
     }
+  },
+  "plugins": {
+    "slots": {
+      "memory": false
+    }
   }
 }
