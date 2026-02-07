@@ -101,7 +101,8 @@ echo -e "${BLUE}You can always update these later with 'gcloud secrets versions 
 echo ""
 
 # AI Provider Keys
-create_secret "anthropic-api-key" "Anthropic API Key (get from console.anthropic.com)" "required"
+create_secret "gemini-api-key" "Google Gemini API Key (get from aistudio.google.com/apikey)" "required"
+create_secret "anthropic-api-key" "Anthropic API Key (get from console.anthropic.com)" "optional"
 create_secret "openai-api-key" "OpenAI API Key (get from platform.openai.com/api-keys)" "optional"
 
 # Gateway Security
@@ -133,7 +134,7 @@ PROJECT_NUMBER=$(gcloud projects describe "$GCP_PROJECT_ID" --format="value(proj
 SERVICE_ACCOUNT="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
 
 # List of all secrets
-SECRETS=("anthropic-api-key" "openai-api-key" "openclaw-gateway-token" "telegram-bot-token" "discord-bot-token" "slack-bot-token")
+SECRETS=("gemini-api-key" "anthropic-api-key" "openai-api-key" "openclaw-gateway-token" "telegram-bot-token" "discord-bot-token" "slack-bot-token")
 
 for SECRET in "${SECRETS[@]}"; do
     if gcloud secrets describe "$SECRET" --project="$GCP_PROJECT_ID" > /dev/null 2>&1; then

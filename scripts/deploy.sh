@@ -101,7 +101,7 @@ echo -e "${BLUE}[6/6] Deploying to Cloud Run...${NC}"
 
 # Build secrets argument dynamically based on what exists
 SECRETS_ARG=""
-for SECRET_PAIR in "ANTHROPIC_API_KEY=anthropic-api-key" "OPENAI_API_KEY=openai-api-key" "OPENCLAW_GATEWAY_TOKEN=openclaw-gateway-token" "TELEGRAM_BOT_TOKEN=telegram-bot-token" "DISCORD_BOT_TOKEN=discord-bot-token" "SLACK_BOT_TOKEN=slack-bot-token"; do
+for SECRET_PAIR in "GOOGLE_API_KEY=gemini-api-key" "ANTHROPIC_API_KEY=anthropic-api-key" "OPENAI_API_KEY=openai-api-key" "OPENCLAW_GATEWAY_TOKEN=openclaw-gateway-token" "TELEGRAM_BOT_TOKEN=telegram-bot-token" "DISCORD_BOT_TOKEN=discord-bot-token" "SLACK_BOT_TOKEN=slack-bot-token"; do
     ENV_VAR="${SECRET_PAIR%%=*}"
     SECRET_NAME="${SECRET_PAIR##*=}"
     
