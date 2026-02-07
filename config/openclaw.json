@@ -35,33 +35,12 @@
   "messages": {
     "ackReactionScope": "group-mentions"
   },
-  "commands": {
-    "native": "auto",
-    "nativeSkills": "auto"
-  },
-  "channels": {
-    "telegram": {
-      "enabled": false,
-      "dmPolicy": "pairing",
-      "streamMode": "partial"
-    }
-  },
   "gateway": {
     "port": 8080,
     "mode": "local",
     "bind": "lan",
     "auth": {
       "mode": "token"
-    }
-  },
-  "plugins": {
-    "entries": {
-      "whatsapp": {
-        "enabled": false
-      },
-      "telegram": {
-        "enabled": false
-      }
     }
   }
 }
