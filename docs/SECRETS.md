@@ -17,6 +17,7 @@ Semua credentials disimpan di **Google Secret Manager** dan diakses saat runtime
 
 | Secret Name | Environment Variable | Required | Description |
 |------------|---------------------|----------|-------------|
+| `gemini-api-key` | `GOOGLE_API_KEY` | Yes* | Google Gemini API Key |
 | `anthropic-api-key` | `ANTHROPIC_API_KEY` | Yes* | Anthropic Claude API key |
 | `openai-api-key` | `OPENAI_API_KEY` | Yes* | OpenAI API key |
 | `openclaw-gateway-token` | `OPENCLAW_GATEWAY_TOKEN` | Yes | Token untuk Control UI |
@@ -27,6 +28,13 @@ Semua credentials disimpan di **Google Secret Manager** dan diakses saat runtime
 \* Minimal salah satu AI provider key diperlukan.
 
 ## Mendapatkan API Keys
+
+### Google Gemini (Primary)
+
+1. Buka [aistudio.google.com/apikey](https://aistudio.google.com/apikey)
+2. Login dengan akun Google
+3. Klik **Get API key**
+4. Copy key yang dihasilkan
 
 ### Anthropic Claude (Recommended)
 

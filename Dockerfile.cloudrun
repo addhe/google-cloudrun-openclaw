@@ -16,6 +16,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     python3 \
     build-essential \
+    ca-certificates \
+    openssl \
+    unzip \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Bun (required for build scripts)
@@ -38,7 +41,11 @@ RUN pnpm install --frozen-lockfile
 # Build the application
 ENV OPENCLAW_A2UI_SKIP_MISSING=1
 ENV OPENCLAW_PREFER_PNPM=1
-RUN pnpm build && pnpm ui:build
+RUN pnpm build
+RUN pnpm build
+RUN pnpm ui:build
+# Debug: verify output location based on vite.config.ts
+RUN ls -la /app/dist/control-ui || echo "control-ui missing in dist"
 
 # ============================================================
 # Production Stage
@@ -57,7 +64,8 @@ WORKDIR /app
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/ui/dist ./ui/dist
+# Copy UI build (output location changed in newer versions)
+COPY --from=builder /app/dist/control-ui ./ui/dist
 
 # Copy config and entrypoint from local context
 COPY config/openclaw.json ./config/openclaw.json

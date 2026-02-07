@@ -88,6 +88,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 
 docker build \
+    --platform linux/amd64 \
     -t "$IMAGE_URI" \
     -f "$PROJECT_DIR/Dockerfile.cloudrun" \
     "$PROJECT_DIR"
