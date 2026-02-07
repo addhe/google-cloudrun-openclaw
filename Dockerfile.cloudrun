@@ -59,9 +59,14 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/ui/dist ./ui/dist
 
-# Create directories for OpenClaw data
-RUN mkdir -p /home/node/.openclaw \
-    && chown -R node:node /app /home/node/.openclaw
+# Copy config and entrypoint from local context
+COPY config/openclaw.json ./config/openclaw.json
+COPY scripts/docker-entrypoint.sh ./docker-entrypoint.sh
+
+# Create directories for OpenClaw data and set permissions
+RUN mkdir -p /home/node/.openclaw/workspace \
+    && chown -R node:node /app /home/node/.openclaw \
+    && chmod +x /app/docker-entrypoint.sh
 
 # Set production environment
 ENV NODE_ENV=production
@@ -79,7 +84,5 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
 # Expose the port (informational)
 EXPOSE ${PORT}
 
-# Start gateway with Cloud Run compatible settings
-# --bind lan: required for Cloud Run to route traffic
-# --port $PORT: Cloud Run injects PORT env variable
-CMD ["sh", "-c", "node dist/index.js gateway --allow-unconfigured --bind lan --port $PORT"]
+# Use entrypoint script to inject secrets and start gateway
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
