@@ -1,0 +1,57 @@
+# Environment files - NEVER commit these!
+.env
+.env.local
+.env.*.local
+*.env
+
+# Secrets and credentials
+secrets/
+*.pem
+*.key
+*.p12
+*.pfx
+
+# OpenClaw data directories
+.openclaw/
+data/
+sessions/
+
+# Node.js
+node_modules/
+dist/
+build/
+.npm
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+
+# Docker
+*.tar
+
+# Build artifacts
+coverage/
+.nyc_output/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+.git
