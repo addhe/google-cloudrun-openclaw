@@ -62,8 +62,7 @@ echo "============================================================"
 echo "OpenClaw Configuration Ready"
 echo "============================================================"
 echo "Gateway Port: ${PORT}"
-echo "Model: google/gemini-3-flash-preview"
 echo "============================================================"
 
 # Start the gateway
-exec node dist/index.js gateway --allow-unconfigured --bind lan --port "${PORT}"
+exec node dist/index.js gateway --allow-unconfigured --bind 0.0.0.0 --port "${PORT}"
