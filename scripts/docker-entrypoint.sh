@@ -12,7 +12,13 @@ CONFIG_DIR="/home/node/.openclaw"
 CONFIG_FILE="${CONFIG_DIR}/openclaw.json"
 
 # Create config directory and device hack
+mkdir -p "${CONFIG_DIR}/identity"
+mkdir -p "${CONFIG_DIR}/agents"
+mkdir -p "${CONFIG_DIR}/credentials"
+mkdir -p "${CONFIG_DIR}/workspace"
 mkdir -p "${CONFIG_DIR}/devices"
+mkdir -p "${CONFIG_DIR}/memory"
+mkdir -p "${CONFIG_DIR}/canvas"
 echo '{"silent": true}' > "${CONFIG_DIR}/devices/pending.json"
 
 # Copy default config if exists
