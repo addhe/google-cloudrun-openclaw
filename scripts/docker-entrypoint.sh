@@ -56,15 +56,43 @@ fi
 
 # Inject Google API Key into agent profile if provided
 if [ -n "$GOOGLE_API_KEY" ]; then
+  # 1. Update main openclaw.json
+  node -e "
+const fs = require('fs');
+const config = JSON.parse(fs.readFileSync('${CONFIG_FILE}', 'utf8'));
+config.auth = config.auth || {};
+config.auth.profiles = config.auth.profiles || {};
+config.auth.profiles['google:default'] = {
+  provider: 'google',
+  mode: 'api_key',
+  key: process.env.GOOGLE_API_KEY
+};
+config.auth.profiles['google'] = {
+  provider: 'google',
+  mode: 'api_key',
+  key: process.env.GOOGLE_API_KEY
+};
+fs.writeFileSync('${CONFIG_FILE}', JSON.stringify(config, null, 2));
+console.log('✓ Google API Key injected into main config');
+"
+
+  # 2. Update agent auth-profiles.json
   AGENT_AUTH_DIR="${CONFIG_DIR}/agents/main/agent"
   mkdir -p "$AGENT_AUTH_DIR"
   node -e "
 const fs = require('fs');
 const auth = {
-  'google:default': {
-    provider: 'google',
-    mode: 'api_key',
-    key: process.env.GOOGLE_API_KEY
+  profiles: {
+    'google:default': {
+      provider: 'google',
+      mode: 'api_key',
+      key: process.env.GOOGLE_API_KEY
+    },
+    'google': {
+      provider: 'google',
+      mode: 'api_key',
+      key: process.env.GOOGLE_API_KEY
+    }
   }
 };
 fs.writeFileSync('${AGENT_AUTH_DIR}/auth-profiles.json', JSON.stringify(auth, null, 2));
