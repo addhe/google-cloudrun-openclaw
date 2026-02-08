@@ -40,7 +40,9 @@
     "mode": "local",
     "bind": "lan",
     "trustedProxies": [
-      "0.0.0.0/0"
+      "loopback",
+      "127.0.0.1",
+      "169.254.169.126"
     ],
     "auth": {
       "mode": "token"

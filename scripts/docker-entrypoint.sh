@@ -11,8 +11,9 @@ set -e
 CONFIG_DIR="/home/node/.openclaw"
 CONFIG_FILE="${CONFIG_DIR}/openclaw.json"
 
-# Create config directory
-mkdir -p "${CONFIG_DIR}"
+# Create config directory and device hack
+mkdir -p "${CONFIG_DIR}/devices"
+echo '{"silent": true}' > "${CONFIG_DIR}/devices/pending.json"
 
 # Copy default config if exists
 if [ -f "/app/config/openclaw.json" ]; then
@@ -64,6 +65,8 @@ echo "============================================================"
 echo "OpenClaw Configuration Ready"
 echo "============================================================"
 echo "Gateway Port: ${PORT}"
+echo "Config:"
+cat "${CONFIG_FILE}"
 echo "============================================================"
 
 # Start the gateway
