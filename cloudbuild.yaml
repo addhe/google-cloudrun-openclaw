@@ -75,4 +75,4 @@ timeout: 2400s  # 40 minutes total
 
 options:
   logging: CLOUD_LOGGING_ONLY
-  machineType: 'E2_HIGHCPU_8'  # Faster build
+  # machineType: 'E2_HIGHCPU_8'  # Reverted to default due to quota limits
