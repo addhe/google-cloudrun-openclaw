@@ -65,4 +65,4 @@ echo "Gateway Port: ${PORT}"
 echo "============================================================"
 
 # Start the gateway
-exec node dist/index.js gateway --allow-unconfigured --bind 0.0.0.0 --port "${PORT}"
+exec node dist/index.js gateway --allow-unconfigured --bind auto --port "${PORT}"
