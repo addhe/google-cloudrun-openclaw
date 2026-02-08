@@ -37,8 +37,9 @@
   },
   "gateway": {
     "port": 8080,
-    "mode": "local",
-    "bind": "lan",
+    "mode": "gateway",
+    "bind": "0.0.0.0",
+    "trustedProxies": ["0.0.0.0/0"],
     "auth": {
       "mode": "token"
     }
