@@ -47,15 +47,17 @@ console.log('✓ Telegram bot configured');
 "
 fi
 
-# Update port from environment
+# Update port and bind from environment
 PORT="${PORT:-8080}"
 node -e "
 const fs = require('fs');
 const config = JSON.parse(fs.readFileSync('${CONFIG_FILE}', 'utf8'));
 config.gateway = config.gateway || {};
 config.gateway.port = parseInt(process.env.PORT || '8080');
+config.gateway.bind = 'lan';
 fs.writeFileSync('${CONFIG_FILE}', JSON.stringify(config, null, 2));
 console.log('✓ Gateway port set to ' + config.gateway.port);
+console.log('✓ Gateway bind set to lan');
 "
 
 echo "============================================================"
@@ -65,4 +67,4 @@ echo "Gateway Port: ${PORT}"
 echo "============================================================"
 
 # Start the gateway
-exec node dist/index.js gateway --allow-unconfigured --bind auto --port "${PORT}"
+exec node dist/index.js gateway --allow-unconfigured --bind lan --port "${PORT}"
