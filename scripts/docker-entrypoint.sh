@@ -23,13 +23,13 @@ echo '{"silent": true}' > "${CONFIG_DIR}/devices/pending.json"
 
 # Copy default config if exists
 if [ -f "/app/config/openclaw.json" ]; then
-    cp /app/config/openclaw.json "${CONFIG_FILE}"
+  cp /app/config/openclaw.json "${CONFIG_FILE}"
 fi
 
 # Inject gateway token if provided
 if [ -n "$OPENCLAW_GATEWAY_TOKEN" ]; then
-    # Use node to update JSON (safer than sed for JSON manipulation)
-    node -e "
+  # Use node to update JSON (safer than sed for JSON manipulation)
+  node -e "
 const fs = require('fs');
 const config = JSON.parse(fs.readFileSync('${CONFIG_FILE}', 'utf8'));
 config.gateway = config.gateway || {};
@@ -42,7 +42,7 @@ fi
 
 # Inject Telegram bot token if provided
 if [ -n "$TELEGRAM_BOT_TOKEN" ]; then
-    node -e "
+  node -e "
 const fs = require('fs');
 const config = JSON.parse(fs.readFileSync('${CONFIG_FILE}', 'utf8'));
 config.channels = config.channels || {};
@@ -51,6 +51,24 @@ config.channels.telegram.enabled = true;
 config.channels.telegram.botToken = process.env.TELEGRAM_BOT_TOKEN;
 fs.writeFileSync('${CONFIG_FILE}', JSON.stringify(config, null, 2));
 console.log('✓ Telegram bot configured');
+"
+fi
+
+# Inject Google API Key into agent profile if provided
+if [ -n "$GOOGLE_API_KEY" ]; then
+  AGENT_AUTH_DIR="${CONFIG_DIR}/agents/main/agent"
+  mkdir -p "$AGENT_AUTH_DIR"
+  node -e "
+const fs = require('fs');
+const auth = {
+  'google:default': {
+    provider: 'google',
+    mode: 'api_key',
+    key: process.env.GOOGLE_API_KEY
+  }
+};
+fs.writeFileSync('${AGENT_AUTH_DIR}/auth-profiles.json', JSON.stringify(auth, null, 2));
+console.log('✓ Google API Key injected into agent profile');
 "
 fi
 
