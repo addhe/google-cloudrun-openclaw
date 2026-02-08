@@ -6,7 +6,7 @@
 # ============================================================
 
 substitutions:
-  _REGION: asia-southeast1
+  _REGION: us-central1
   _SERVICE_NAME: openclaw
   _REPOSITORY: openclaw-repo
   _TAG: latest
