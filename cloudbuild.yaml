@@ -61,7 +61,7 @@ steps:
       - '--timeout'
       - '600s'
       - '--set-secrets'
-      - 'GOOGLE_API_KEY=gemini-api-key:latest,OPENCLAW_GATEWAY_TOKEN=openclaw-gateway-token:latest'
+      - 'GOOGLE_API_KEY=gemini-api-key:latest,GEMINI_API_KEY=gemini-api-key:latest,OPENCLAW_GATEWAY_TOKEN=openclaw-gateway-token:latest'
       - '--set-env-vars'
       - 'NODE_ENV=production,LOG_LEVEL=info'
     waitFor: ['push']
