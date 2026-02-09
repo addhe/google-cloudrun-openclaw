@@ -103,6 +103,8 @@ echo "OpenClaw Configuration Ready"
 echo "============================================================"
 echo "Gateway Port: ${PORT:-8080}"
 echo "Config Ready at: ${CONFIG_FILE}"
+echo "Directory Structure:"
+ls -R "${CONFIG_DIR}"
 echo "============================================================"
 
 # Start the gateway
