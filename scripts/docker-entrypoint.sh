@@ -49,7 +49,7 @@ if (process.env.GOOGLE_API_KEY) {
   const googleProfile = {
     provider: 'google',
     mode: 'api_key',
-    key: process.env.GOOGLE_API_KEY
+    apiKey: process.env.GOOGLE_API_KEY
   };
   config.auth.profiles['google:default'] = googleProfile;
   config.auth.profiles['google'] = googleProfile;
@@ -82,15 +82,17 @@ if [ -n "$GOOGLE_API_KEY" ]; then
   node -e "
 const fs = require('fs');
 const auth = {
-  'google:default': {
-    provider: 'google',
-    mode: 'api_key',
-    key: process.env.GOOGLE_API_KEY
-  },
-  'google': {
-    provider: 'google',
-    mode: 'api_key',
-    key: process.env.GOOGLE_API_KEY
+  profiles: {
+    'google:default': {
+      provider: 'google',
+      mode: 'api_key',
+      apiKey: process.env.GOOGLE_API_KEY
+    },
+    'google': {
+      provider: 'google',
+      mode: 'api_key',
+      apiKey: process.env.GOOGLE_API_KEY
+    }
   }
 };
 fs.writeFileSync('${AGENT_AUTH_DIR}/auth-profiles.json', JSON.stringify(auth, null, 2));
@@ -108,10 +110,10 @@ const fs = require('fs');
 const c = JSON.parse(fs.readFileSync('${CONFIG_FILE}'));
 if(c.gateway && c.gateway.auth && c.gateway.auth.token) c.gateway.auth.token = '***';
 if(c.auth && c.auth.profiles) {
-  Object.values(c.auth.profiles).forEach(p => { if(p.key) p.key = '***' });
+  Object.values(c.auth.profiles).forEach(p => { if(p.apiKey) p.apiKey = '***' });
 }
 console.log(JSON.stringify(c, null, 2));
-" || cat "${CONFIG_FILE}"
+" || echo "[Redaction failed, config hidden]"
 echo "============================================================"
 
 # Start the gateway
