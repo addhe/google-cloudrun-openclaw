@@ -59,7 +59,7 @@ steps:
       - '--max-instances'
       - '3'
       - '--timeout'
-      - '300s'
+      - '600s'
       - '--set-secrets'
       - 'GOOGLE_API_KEY=gemini-api-key:latest,OPENCLAW_GATEWAY_TOKEN=openclaw-gateway-token:latest'
       - '--set-env-vars'
