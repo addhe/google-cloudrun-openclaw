@@ -7,6 +7,8 @@ set -e
 CONFIG_DIR="/home/node/.openclaw"
 CONFIG_FILE="${CONFIG_DIR}/openclaw.json"
 
+echo "=== OpenClaw Startup ==="
+
 # Create required directories
 mkdir -p "${CONFIG_DIR}/identity"
 mkdir -p "${CONFIG_DIR}/agents/main/agent"
@@ -15,19 +17,43 @@ mkdir -p "${CONFIG_DIR}/workspace"
 mkdir -p "${CONFIG_DIR}/devices"
 mkdir -p "${CONFIG_DIR}/memory"
 mkdir -p "${CONFIG_DIR}/canvas"
+mkdir -p "${CONFIG_DIR}/extensions"
+
+# Copy extensions from build stage to home dir
+if [ -d "/app/extensions" ]; then
+  echo "✓ Copying extensions..."
+  cp -r /app/extensions/* "${CONFIG_DIR}/extensions/"
+fi
 
 # Pre-approve devices hack
 echo '{"silent": true}' > "${CONFIG_DIR}/devices/pending.json"
 
-# Copy default config if exists
-if [ -f "/app/config/openclaw.json" ]; then
-  cp /app/config/openclaw.json "${CONFIG_FILE}"
+# Create a default SOUL for the main agent if missing
+if [ ! -f "${CONFIG_DIR}/agents/main/SOUL.md" ]; then
+  echo "✓ Creating default SOUL..."
+  cat > "${CONFIG_DIR}/agents/main/SOUL.md" <<EOF
+# Main Agent
+You are a helpful AI assistant running on OpenClaw.
+Respond concisely and helpfully to user requests.
+EOF
 fi
 
-# 1. Update Main openclaw.json (Schema Matching Production)
+# Copy base config from /app/config if it exists and we don't have one
+if [ -f "/app/config/openclaw.json" ] && [ ! -f "${CONFIG_FILE}" ]; then
+  cp /app/config/openclaw.json "${CONFIG_FILE}"
+elif [ ! -f "${CONFIG_FILE}" ]; then
+  echo "{}" > "${CONFIG_FILE}"
+fi
+
+# 1. Update Main openclaw.json
 node -e "
 const fs = require('fs');
-const config = JSON.parse(fs.readFileSync('${CONFIG_FILE}', 'utf8'));
+let config = {};
+try {
+  config = JSON.parse(fs.readFileSync('${CONFIG_FILE}', 'utf8'));
+} catch (e) {
+  config = {};
+}
 
 // Gateway Settings for Cloud Run
 config.gateway = config.gateway || {};
@@ -38,31 +64,30 @@ config.gateway.controlUi = config.gateway.controlUi || {};
 config.gateway.controlUi.allowInsecureAuth = true;
 config.gateway.controlUi.dangerouslyDisableDeviceAuth = true;
 
-// Auth Profile Declaration (No keys here to avoid validation error)
-config.auth = {
-  profiles: {
-    'google:default': {
-      provider: 'google',
-      mode: 'api_key'
-    }
-  }
+// Auth Profile Declaration
+config.auth = config.auth || {};
+config.auth.profiles = config.auth.profiles || {};
+config.auth.profiles['google:default'] = {
+  provider: 'google',
+  mode: 'api_key'
 };
+
+// Plugin Slots (Match hack-start.sh)
+config.plugins = config.plugins || {};
+config.plugins.slots = config.plugins.slots || {};
+config.plugins.slots.memory = 'memory-core';
+
+// Model Defaults
+config.agents = config.agents || {};
+config.agents.defaults = config.agents.defaults || {};
+config.agents.defaults.model = config.agents.defaults.model || {};
+config.agents.defaults.model.primary = process.env.PRIMARY_MODEL || 'google/gemini-3-flash-preview';
 
 // Gateway Token
 if (process.env.OPENCLAW_GATEWAY_TOKEN) {
   config.gateway.auth = {
     mode: 'token',
     token: process.env.OPENCLAW_GATEWAY_TOKEN
-  };
-}
-
-// Telegram
-if (process.env.TELEGRAM_BOT_TOKEN) {
-  config.channels = config.channels || {};
-  config.channels.telegram = {
-    enabled: true,
-    botToken: process.env.TELEGRAM_BOT_TOKEN,
-    dmPolicy: 'pairing'
   };
 }
 
@@ -94,15 +119,13 @@ const auth = {
   }
 };
 fs.writeFileSync('${CONFIG_DIR}/agents/main/agent/auth-profiles.json', JSON.stringify(auth, null, 2));
-console.log('✓ Agent auth profiles injected (Production Format)');
+console.log('✓ Agent auth profiles injected');
 "
 fi
 
 echo "============================================================"
 echo "OpenClaw Configuration Ready"
 echo "============================================================"
-echo "Gateway Port: ${PORT:-8080}"
-echo "Config Ready at: ${CONFIG_FILE}"
 echo "Directory Structure:"
 ls -R "${CONFIG_DIR}"
 echo "============================================================"
