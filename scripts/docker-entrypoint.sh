@@ -18,6 +18,9 @@ mkdir -p "${CONFIG_DIR}/devices"
 mkdir -p "${CONFIG_DIR}/memory"
 mkdir -p "${CONFIG_DIR}/canvas"
 
+echo "✓ Directories created"
+echo "✓ Agent directory: ${CONFIG_DIR}/agents/main/agent"
+
 # Note: We rely on /app/extensions for plugins to avoid duplication
 
 # Pre-approve devices hack
@@ -78,6 +81,8 @@ if (process.env.OPENCLAW_GATEWAY_TOKEN) {
 
 fs.writeFileSync('${CONFIG_FILE}', JSON.stringify(config, null, 2));
 console.log('✓ Config generated');
+console.log('✓ Config file created at: ${CONFIG_FILE}');
+console.log('✓ Agent model: ' + config.agents.defaults.model.primary);
 "
 
 # 2. Update Agent auth-profiles.json
@@ -99,7 +104,10 @@ const auth = {
 };
 fs.writeFileSync('${CONFIG_DIR}/agents/main/agent/auth-profiles.json', JSON.stringify(auth, null, 2));
 console.log('✓ Auth profiles injected (Key Length: ' + process.env.GOOGLE_API_KEY.length + ')');
+console.log('✓ Auth file created at: ${CONFIG_DIR}/agents/main/agent/auth-profiles.json');
 "
+else
+  echo "❌ WARNING: No GOOGLE_API_KEY found!"
 fi
 
 echo "============================================================"
