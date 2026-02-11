@@ -63,7 +63,7 @@ steps:
       - '--set-secrets'
       - 'GOOGLE_API_KEY=gemini-api-key:latest,GEMINI_API_KEY=gemini-api-key:latest,OPENCLAW_GATEWAY_TOKEN=openclaw-gateway-token:latest'
       - '--set-env-vars'
-      - 'NODE_ENV=production,LOG_LEVEL=debug,PRIMARY_MODEL=google/gemini-3-flash-preview'
+      - 'NODE_ENV=production,LOG_LEVEL=trace,PRIMARY_MODEL=google/gemini-3-flash-preview'
     waitFor: ['push']
 
 # Build configuration
