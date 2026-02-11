@@ -104,7 +104,8 @@ fi
 
 echo "============================================================"
 echo "OpenClaw Ready"
+echo "DEBUG: Log level set to trace"
 echo "============================================================"
 
-# Start the gateway
-exec node dist/index.js gateway --allow-unconfigured --bind lan --port "${PORT:-8080}"
+# Start the gateway with debug logging
+exec node dist/index.js gateway --allow-unconfigured --bind lan --port "${PORT:-8080}" --log-level=trace
