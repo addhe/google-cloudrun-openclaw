@@ -60,13 +60,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
-# Create dummy memory-core plugin to prevent startup errors
-# This is a build-time fix for the missing plugin issue
-RUN mkdir -p /app/extensions/memory-core
-RUN echo '{"name":"@openclaw/memory-core","version":"0.0.0","main":"index.js","openclaw":{"id":"memory-core","kind":"memory"}}' > /app/extensions/memory-core/package.json
-RUN echo 'module.exports={id:"memory-core",register(api){if(api.registerMemory)api.registerMemory({id:"memory-core",search:async()=>[],add:async()=>{},get:async()=>null})}}' > /app/extensions/memory-core/index.js
-RUN echo '{"id":"memory-core","kind":"memory","configSchema":{}}' > /app/extensions/memory-core/openclaw.plugin.json
-
 # Copy built application from builder
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
@@ -75,6 +68,8 @@ COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/dist/control-ui ./ui/dist
 # Copy supporting files needed by the gateway (templates, docs, etc.)
 COPY --from=builder /app/docs ./docs
+# Copy extensions from builder (includes proper plugins)
+COPY --from=builder /app/extensions ./extensions
 
 # Copy config and entrypoint from local context
 COPY config/openclaw.json ./config/openclaw.json
