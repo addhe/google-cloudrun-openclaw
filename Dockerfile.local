@@ -1,0 +1,93 @@
+# ============================================================
+# OpenClaw - Dockerfile for Local Development (Multi-Arch)
+# ============================================================
+# Optimized for local development with:
+# - Multi-architecture support (ARM64, AMD64)
+# - Local environment variables
+# - Debug logging enabled
+#
+# Build Commands:
+# - For current platform: docker build -f Dockerfile.local -t openclaw-local:latest .
+# - For multi-platform: docker buildx build --platform linux/amd64,linux/arm64 -f Dockerfile.local -t openclaw-local:latest .
+# ============================================================
+
+FROM node:22-bookworm-slim AS builder
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    git \
+    python3 \
+    build-essential \
+    ca-certificates \
+    openssl \
+    unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Bun (required for build scripts)
+RUN curl -fsSL https://bun.sh/install | bash
+ENV PATH="/root/.bun/bin:${PATH}"
+
+# Enable corepack for pnpm
+RUN corepack enable
+
+WORKDIR /app
+
+# Clone OpenClaw repository
+ARG OPENCLAW_VERSION=latest
+RUN git clone --depth 1 https://github.com/openclaw/openclaw.git . \
+    && if [ "$OPENCLAW_VERSION" != "latest" ]; then git checkout "$OPENCLAW_VERSION"; fi
+
+# Install dependencies
+RUN pnpm install --frozen-lockfile
+
+# Build the application
+ENV OPENCLAW_A2UI_SKIP_MISSING=1
+ENV OPENCLAW_PREFER_PNPM=1
+RUN pnpm build
+RUN pnpm build
+RUN pnpm ui:build
+
+# ============================================================
+# Production Stage
+# ============================================================
+FROM node:22-bookworm-slim AS production
+
+# Install runtime dependencies only
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy built application from builder
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./package.json
+# Copy UI build (output location changed in newer versions)
+COPY --from=builder /app/dist/control-ui ./ui/dist
+# Copy supporting files needed by the gateway (templates, docs, etc.)
+COPY --from=builder /app/docs ./docs
+# Copy extensions from builder (includes proper plugins)
+COPY --from=builder /app/extensions ./extensions
+
+# Copy config and entrypoint from local context
+COPY config/openclaw.json ./config/openclaw.json
+COPY scripts/docker-entrypoint.sh ./docker-entrypoint.sh
+
+# Create directories for OpenClaw data and set permissions
+RUN mkdir -p /home/node/.openclaw/workspace \
+    && chown -R node:node /app /home/node/.openclaw \
+    && chmod +x /app/docker-entrypoint.sh
+
+# Set production environment
+ENV NODE_ENV=development
+ENV LOG_LEVEL=trace
+ENV PORT=8080
+
+# Security: run as non-root user
+USER node
+
+# Use entrypoint script to inject secrets and start gateway
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
