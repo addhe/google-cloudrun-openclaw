@@ -35,7 +35,6 @@ steps:
       - 'openclaw'
       - '--image=us-central1-docker.pkg.dev/$PROJECT_ID/openclaw-repo/openclaw-supabase'
       - '--region=us-central1'
-      - '--platform=linux/amd64'
       - '--allow-unauthenticated'
       - '--memory=1Gi'
       - '--cpu=1'
