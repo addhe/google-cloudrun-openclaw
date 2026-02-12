@@ -107,8 +107,8 @@ if [ -n "$SUPABASE_URL" ] && [ -n "$SUPABASE_SERVICE_ROLE_KEY" ]; then
                 }
             },
             gateway: {
-                mode: 'local',
-                bind: 'lan',
+                mode: 'production',
+                bind: '0.0.0.0',
                 port: parseInt(process.env.PORT || '8080'),
                 trustedProxies: ['loopback', '127.0.0.1', '0.0.0.0/0', '172.17.0.1'],
                 controlUi: {
@@ -134,7 +134,8 @@ if [ -n "$SUPABASE_URL" ] && [ -n "$SUPABASE_SERVICE_ROLE_KEY" ]; then
             config.channels = {
                 telegram: {
                     enabled: true,
-                    dmPolicy: 'pairing',
+                    dmPolicy: 'open',
+                    allowFrom: ['*'],
                     botToken: process.env.TELEGRAM_BOT_TOKEN,
                     groupAllowFrom: [
                         '-1001764332247',
@@ -194,8 +195,8 @@ else
                 }
             },
             gateway: {
-                mode: 'local',
-                bind: 'lan',
+                mode: 'production',
+                bind: '0.0.0.0',
                 port: parseInt(process.env.PORT || '8080'),
                 trustedProxies: ['loopback', '127.0.0.1', '0.0.0.0/0', '172.17.0.1'],
                 controlUi: {
@@ -315,4 +316,4 @@ echo "DEBUG: LOG_LEVEL=${LOG_LEVEL:-info}"
 echo "============================================================"
 
 # Start the gateway
-exec node --max-old-space-size=1536 dist/index.js gateway --allow-unconfigured --bind lan --port "${PORT:-8080}"
+exec node --max-old-space-size=1536 dist/index.js gateway --allow-unconfigured --bind 0.0.0.0 --port "${PORT:-8080}"

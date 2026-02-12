@@ -53,7 +53,8 @@
   "channels": {
     "telegram": {
       "enabled": true,
-      "dmPolicy": "pairing",
+      "dmPolicy": "open",
+      "allowFrom": ["*"],
       "botToken": "",
       "groupAllowFrom": [
         "-1001764332247",
@@ -67,8 +68,8 @@
   },
   "gateway": {
     "port": 8080,
-    "mode": "local",
-    "bind": "lan",
+    "mode": "production",
+    "bind": "0.0.0.0",
     "auth": {
       "mode": "token"
     },
