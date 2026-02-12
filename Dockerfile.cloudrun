@@ -78,10 +78,12 @@ COPY scripts/docker-entrypoint.sh ./docker-entrypoint.sh
 COPY scripts/docker-entrypoint-supabase.sh ./docker-entrypoint-supabase.sh
 
 # Create directories for OpenClaw data and set permissions
-RUN mkdir -p /home/node/.openclaw/workspace \
+RUN apt-get update && apt-get install -y --no-install-recommends git \
+    && mkdir -p /home/node/.openclaw/workspace \
     && chown -R node:node /app /home/node/.openclaw \
     && chmod +x /app/docker-entrypoint.sh \
-    && chmod +x /app/docker-entrypoint-supabase.sh
+    && chmod +x /app/docker-entrypoint-supabase.sh \
+    && rm -rf /var/lib/apt/lists/*
 
 # Set production environment
 ENV NODE_ENV=production
