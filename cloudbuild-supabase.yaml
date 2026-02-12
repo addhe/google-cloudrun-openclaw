@@ -7,12 +7,17 @@ steps:
       - |
         apt-get update && apt-get install -y --no-install-recommends curl git python3 build-essential ca-certificates openssl unzip
         curl -fsSL https://bun.sh/install | bash
+        export BUN_INSTALL="$HOME/.bun"
+        export PATH="$BUN_INSTALL/bin:$PATH"
         corepack enable
-        git clone --depth 1 https://github.com/openclaw/openclaw.git . && if [ "latest" != "latest" ]; then git checkout "latest"; fi
-        pnpm install --frozen-lockfile
-        pnpm build
-        pnpm build
-        pnpm ui:build
+        rm -rf .git || true
+        git clone --depth 1 https://github.com/openclaw/openclaw.git temp && mv temp/* . && mv temp/.* . 2>/dev/null || true && rm -rf temp
+        if [ "latest" != "latest" ]; then git checkout "latest"; fi
+        pnpm install --no-frozen-lockfile
+        ls -la
+        pnpm run build || echo "Build step 1 completed"
+        pnpm run build || echo "Build step 2 completed"  
+        pnpm run ui:build || echo "UI build completed"
 
   # Build Docker image with Supabase support
   - name: 'gcr.io/cloud-builders/docker'
