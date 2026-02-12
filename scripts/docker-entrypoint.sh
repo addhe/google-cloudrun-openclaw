@@ -55,6 +55,9 @@ let config = {
     controlUi: {
       allowInsecureAuth: true,
       dangerouslyDisableDeviceAuth: true
+    },
+    auth: {
+      mode: 'none'
     }
   },
   auth: {
