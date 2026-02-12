@@ -27,54 +27,68 @@ echo "✓ Agent directory: ${CONFIG_DIR}/agents/main/agent"
 echo '{"silent": true}' > "${CONFIG_DIR}/devices/pending.json"
 
 # Create a default SOUL for the main agent
-echo "✓ Preparing Agent SOUL..."
-cat > "${CONFIG_DIR}/agents/main/SOUL.md" <<EOF
+if [ ! -f "${CONFIG_DIR}/agents/main/SOUL.md" ]; then
+  echo "✓ Preparing Agent SOUL..."
+  cat > "${CONFIG_DIR}/agents/main/SOUL.md" <<EOF
 # Main Agent
 You are a helpful AI assistant.
 Respond concisely.
 EOF
+else
+  echo "✓ Agent SOUL already exists, skipping creation"
+fi
 
 # 1. Update Main openclaw.json
 node -e "
 const fs = require('fs');
-let config = {
-  meta: { lastTouchedVersion: '2026.2.3-1' },
-  agents: {
-    defaults: {
-      model: {
-        primary: process.env.PRIMARY_MODEL || 'google/gemini-3-flash-preview'
+
+// Try to load existing config first, otherwise generate new one
+let config;
+if (fs.existsSync('${CONFIG_FILE}')) {
+  config = JSON.parse(fs.readFileSync('${CONFIG_FILE}', 'utf8'));
+  console.log('✓ Using existing config file');
+} else {
+  config = {
+    meta: { lastTouchedVersion: '2026.2.3-1' },
+    agents: {
+      defaults: {
+        model: {
+          primary: process.env.PRIMARY_MODEL || 'glm-4.7:cloud'
+        },
+        workspace: '${CONFIG_DIR}/workspace'
+      }
+    },
+    gateway: {
+      mode: 'local',
+      bind: 'lan',
+      port: parseInt(process.env.PORT || '8080'),
+      trustedProxies: ['loopback', '127.0.0.1', '0.0.0.0/0', '172.17.0.1'],
+      controlUi: {
+        allowInsecureAuth: true,
+        dangerouslyDisableDeviceAuth: true
       },
-      workspace: '${CONFIG_DIR}/workspace'
-    }
-  },
-  gateway: {
-    mode: 'local',
-    bind: 'lan',
-    port: parseInt(process.env.PORT || '8080'),
-    trustedProxies: ['loopback', '127.0.0.1', '0.0.0.0/0', '172.17.0.1'],
-    controlUi: {
-      allowInsecureAuth: true,
-      dangerouslyDisableDeviceAuth: true
+      auth: {
+        mode: 'token'
+      }
     },
     auth: {
-      mode: 'none'
-    }
-  },
-  auth: {
-    profiles: {
-      'google:default': {
-        provider: 'google',
-        mode: 'api_key'
+      profiles: {
+        'google:default': {
+          provider: 'google',
+          mode: 'api_key'
+        }
+      }
+    },
+    plugins: {
+      slots: {
+        memory: 'memory-core'
       }
     }
-  },
-  plugins: {
-    slots: {
-      memory: 'memory-core'
-    }
-  }
-};
+  };
+  console.log('✓ Generated new config');
+}
 
+// Update dynamic values
 if (process.env.OPENCLAW_GATEWAY_TOKEN) {
   config.gateway.auth = {
     mode: 'token',
@@ -82,35 +96,66 @@ if (process.env.OPENCLAW_GATEWAY_TOKEN) {
   };
 }
 
+if (process.env.PRIMARY_MODEL) {
+  config.agents.defaults.model.primary = process.env.PRIMARY_MODEL;
+}
+
 fs.writeFileSync('${CONFIG_FILE}', JSON.stringify(config, null, 2));
-console.log('✓ Config generated');
-console.log('✓ Config file created at: ${CONFIG_FILE}');
+console.log('✓ Config updated');
+console.log('✓ Config file at: ${CONFIG_FILE}');
 console.log('✓ Agent model: ' + config.agents.defaults.model.primary);
 "
 
 # 2. Update Agent auth-profiles.json
-if [ -n "$GOOGLE_API_KEY" ]; then
+if [ -n "$OLLAMA_BASE_URL" ] || [ -n "$GOOGLE_API_KEY" ] || [ -n "$OPENAI_API_KEY" ]; then
   node -e "
 const fs = require('fs');
-const auth = {
+let auth = {
   version: 1,
-  profiles: {
-    'google:default': {
-      type: 'api_key',
-      provider: 'google',
-      key: process.env.GOOGLE_API_KEY
-    }
-  },
-  lastGood: {
-    google: 'google:default'
-  }
+  profiles: {},
+  lastGood: {}
 };
-fs.writeFileSync('${CONFIG_DIR}/agents/main/agent/auth-profiles.json', JSON.stringify(auth, null, 2));
-console.log('✓ Auth profiles injected (Key Length: ' + process.env.GOOGLE_API_KEY.length + ')');
-console.log('✓ Auth file created at: ${CONFIG_DIR}/agents/main/agent/auth-profiles.json');
+
+// Add Ollama profile if OLLAMA_BASE_URL is provided
+if (process.env.OLLAMA_BASE_URL) {
+  auth.profiles['ollama:default'] = {
+    type: 'openai_compatible',
+    provider: 'ollama',
+    baseUrl: process.env.OLLAMA_BASE_URL
+  };
+  auth.lastGood.ollama = 'ollama:default';
+}
+
+// Add OpenAI profile if OPENAI_API_KEY is provided
+if (process.env.OPENAI_API_KEY) {
+  auth.profiles['openai:default'] = {
+    type: 'openai_compatible',
+    provider: 'openai',
+    apiKey: process.env.OPENAI_API_KEY,
+    baseUrl: process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1'
+  };
+  auth.lastGood.openai = 'openai:default';
+}
+if (process.env.GOOGLE_API_KEY) {
+  auth.profiles['google:default'] = {
+    type: 'api_key',
+    provider: 'google',
+    key: process.env.GOOGLE_API_KEY
+  };
+  auth.lastGood.google = 'google:default';
+}
+
+const authPath = '${CONFIG_DIR}/agents/main/agent/auth-profiles.json';
+if (!fs.existsSync(authPath)) {
+  fs.writeFileSync(authPath, JSON.stringify(auth, null, 2));
+  console.log('✓ Auth profiles injected');
+  console.log('✓ Auth file created at: ' + authPath);
+} else {
+  console.log('✓ Auth file already exists, skipping injection');
+}
 "
 else
-  echo "❌ WARNING: No GOOGLE_API_KEY found!"
+  echo "❌ WARNING: No OLLAMA_BASE_URL, GOOGLE_API_KEY, or OPENAI_API_KEY found!"
 fi
 
 echo "============================================================"

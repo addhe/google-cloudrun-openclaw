@@ -15,6 +15,7 @@ secrets/
 .openclaw/
 data/
 sessions/
+data/**
 
 # Node.js
 node_modules/
