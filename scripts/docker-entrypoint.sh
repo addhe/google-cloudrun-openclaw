@@ -51,7 +51,7 @@ let config = {
     mode: 'local',
     bind: 'lan',
     port: parseInt(process.env.PORT || '8080'),
-    trustedProxies: ['loopback', '127.0.0.1', '0.0.0.0/0'],
+    trustedProxies: ['loopback', '127.0.0.1', '0.0.0.0/0', '172.17.0.1'],
     controlUi: {
       allowInsecureAuth: true,
       dangerouslyDisableDeviceAuth: true
