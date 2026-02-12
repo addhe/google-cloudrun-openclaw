@@ -315,4 +315,4 @@ echo "DEBUG: LOG_LEVEL=${LOG_LEVEL:-info}"
 echo "============================================================"
 
 # Start the gateway
-exec node dist/index.js gateway --allow-unconfigured --bind lan --port "${PORT:-8080}"
+exec node --max-old-space-size=1536 dist/index.js gateway --allow-unconfigured --bind lan --port "${PORT:-8080}"
