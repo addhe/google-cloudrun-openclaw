@@ -1,0 +1,48 @@
+steps:
+  # Build the application
+  - name: 'node:22-bookworm-slim'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        apt-get update && apt-get install -y --no-install-recommends curl git python3 build-essential ca-certificates openssl unzip
+        curl -fsSL https://bun.sh/install | bash
+        corepack enable
+        git clone --depth 1 https://github.com/openclaw/openclaw.git . && if [ "latest" != "latest" ]; then git checkout "latest"; fi
+        pnpm install --frozen-lockfile
+        pnpm build
+        pnpm build
+        pnpm ui:build
+
+  # Build Docker image with Supabase support
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/openclaw-repo/openclaw-supabase', '-f', 'Dockerfile.cloudrun', '.']
+
+  # Push to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'us-central1-docker.pkg.dev/$PROJECT_ID/openclaw-repo/openclaw-supabase']
+
+  # Deploy to Cloud Run with Supabase secrets
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'openclaw'
+      - '--image=us-central1-docker.pkg.dev/$PROJECT_ID/openclaw-repo/openclaw-supabase'
+      - '--region=us-central1'
+      - '--platform=linux/amd64'
+      - '--allow-unauthenticated'
+      - '--memory=1Gi'
+      - '--cpu=1'
+      - '--timeout=300'
+      - '--concurrency=1000'
+      - '--max-instances=10'
+      - '--min-instances=0'
+      - '--set-secrets=OPENAI_API_KEY=openai-api-key:latest,OPENCLAW_GATEWAY_TOKEN=openclaw-gateway-token:latest,TELEGRAM_BOT_TOKEN=telegram-bot-token:latest,SUPABASE_URL=supabase-url:latest,SUPABASE_SERVICE_ROLE_KEY=supabase-service-role-key:latest'
+      - '--set-env-vars=PRIMARY_MODEL=openai/gpt-4o-mini,LOG_LEVEL=debug,NODE_ENV=production'
+
+images:
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/openclaw-repo/openclaw-supabase'
+
+options:
+  logging: CLOUD_LOGGING_ONLY

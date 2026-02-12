@@ -66,19 +66,22 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 # Copy UI build (output location changed in newer versions)
 COPY --from=builder /app/dist/control-ui ./ui/dist
+
 # Copy supporting files needed by the gateway (templates, docs, etc.)
 COPY --from=builder /app/docs ./docs
 # Copy extensions from builder (includes proper plugins)
 COPY --from=builder /app/extensions ./extensions
 
-# Copy config and entrypoint from local context
+# Copy configuration and entrypoint scripts
 COPY config/openclaw.json ./config/openclaw.json
 COPY scripts/docker-entrypoint.sh ./docker-entrypoint.sh
+COPY scripts/docker-entrypoint-supabase.sh ./docker-entrypoint-supabase.sh
 
 # Create directories for OpenClaw data and set permissions
 RUN mkdir -p /home/node/.openclaw/workspace \
     && chown -R node:node /app /home/node/.openclaw \
-    && chmod +x /app/docker-entrypoint.sh
+    && chmod +x /app/docker-entrypoint.sh \
+    && chmod +x /app/docker-entrypoint-supabase.sh
 
 # Set production environment
 ENV NODE_ENV=production
@@ -89,5 +92,5 @@ ENV PORT=8080
 # Security: run as non-root user
 USER node
 
-# Use entrypoint script to inject secrets and start gateway
-ENTRYPOINT ["/app/docker-entrypoint.sh"]
+# Use Supabase-enabled entrypoint script to inject secrets and start gateway
+ENTRYPOINT ["/app/docker-entrypoint-supabase.sh"]
