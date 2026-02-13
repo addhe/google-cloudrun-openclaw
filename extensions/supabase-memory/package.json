@@ -1,0 +1,11 @@
+{
+  "name": "@openclaw/supabase-memory",
+  "version": "0.1.0",
+  "main": "index.js",
+  "description": "Supabase-backed memory plugin for OpenClaw",
+  "license": "MIT",
+  "openclaw": {
+    "id": "supabase-memory",
+    "kind": "memory"
+  }
+}

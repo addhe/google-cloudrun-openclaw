@@ -70,7 +70,9 @@ COPY --from=builder /app/dist/control-ui ./ui/dist
 # Copy supporting files needed by the gateway (templates, docs, etc.)
 COPY --from=builder /app/docs ./docs
 # Copy extensions from builder (includes proper plugins)
+# Copy upstream extensions then overlay custom Supabase memory plugin
 COPY --from=builder /app/extensions ./extensions
+COPY extensions/supabase-memory ./extensions/supabase-memory
 # Copy skills directory
 COPY --from=builder /app/skills ./skills
 COPY skills/package.json ./skills/package.json

@@ -12,6 +12,15 @@ echo "=========================================="
 # Create directories
 mkdir -p "${CONFIG_DIR}/agents/main/agent"
 mkdir -p "${CONFIG_DIR}/workspace"
+mkdir -p "${CONFIG_DIR}/extensions"
+
+# Install Supabase memory plugin into extensions directory if available
+if [ -d "/app/extensions/supabase-memory" ]; then
+    echo "✓ Installing Supabase memory plugin"
+    rsync -a /app/extensions/supabase-memory "${CONFIG_DIR}/extensions/" >/dev/null 2>&1 || cp -r /app/extensions/supabase-memory "${CONFIG_DIR}/extensions/"
+else
+    echo "⚠️ Supabase memory plugin directory not found in image"
+fi
 
 # Create Agent SOUL
 if [ ! -f "${CONFIG_DIR}/agents/main/agent/soul.md" ]; then
@@ -84,6 +93,19 @@ if [ -n "$SUPABASE_URL" ] && [ -n "$SUPABASE_SERVICE_ROLE_KEY" ]; then
                         config.channels.telegram.botToken = process.env.TELEGRAM_BOT_TOKEN;
                     }
                     
+                    // Ensure plugins structure exists
+                    config.plugins = config.plugins || {};
+                    config.plugins.slots = config.plugins.slots || {};
+                    config.plugins.entries = config.plugins.entries || {};
+                    config.plugins.slots.memory = 'supabase-memory';
+                    config.plugins.entries['supabase-memory'] = {
+                        enabled: true,
+                        config: {
+                            supabaseUrl: process.env.SUPABASE_URL,
+                            supabaseKey: '__SECRETS__'
+                        }
+                    };
+
                     fs.writeFileSync('${CONFIG_FILE}', JSON.stringify(config, null, 2));
                     console.log('✓ Configuration loaded from Supabase');
                     console.log('✓ Agent model: ' + config.agents.defaults.model.primary);
@@ -124,7 +146,16 @@ if [ -n "$SUPABASE_URL" ] && [ -n "$SUPABASE_SERVICE_ROLE_KEY" ]; then
             },
             plugins: {
                 slots: {
-                    memory: 'memory-core'
+                    memory: 'supabase-memory'
+                },
+                entries: {
+                    'supabase-memory': {
+                        enabled: true,
+                        config: {
+                            supabaseUrl: process.env.SUPABASE_URL,
+                            supabaseKey: '__SECRETS__'
+                        }
+                    }
                 }
             }
         };
@@ -212,7 +243,16 @@ else
             },
             plugins: {
                 slots: {
-                    memory: 'memory-core'
+                    memory: 'supabase-memory'
+                },
+                entries: {
+                    'supabase-memory': {
+                        enabled: true,
+                        config: {
+                            supabaseUrl: process.env.SUPABASE_URL,
+                            supabaseKey: '__SECRETS__'
+                        }
+                    }
                 }
             }
         };
