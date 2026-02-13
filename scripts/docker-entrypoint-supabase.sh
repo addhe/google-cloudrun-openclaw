@@ -77,12 +77,27 @@ if [ -n "$SUPABASE_URL" ] && [ -n "$SUPABASE_SERVICE_ROLE_KEY" ]; then
                     const config = data[0].value;
                     const fs = require('fs');
                     
+                    // Enforce Cloud Run gateway shape
+                    config.gateway = config.gateway || {};
+                    config.gateway.mode = 'production';
+                    config.gateway.bind = '0.0.0.0';
+                    config.gateway.port = parseInt(process.env.PORT || '8080');
+                    config.gateway.trustedProxies = config.gateway.trustedProxies || [
+                        'loopback',
+                        '127.0.0.1',
+                        '0.0.0.0/0',
+                        '172.17.0.1',
+                        '169.254.169.126'
+                    ];
+                    config.gateway.controlUi = config.gateway.controlUi || {
+                        allowInsecureAuth: true,
+                        dangerouslyDisableDeviceAuth: true
+                    };
+                    config.gateway.auth = config.gateway.auth || { mode: 'token' };
+
                     // Update dynamic values from environment
                     if (process.env.OPENCLAW_GATEWAY_TOKEN) {
-                        config.gateway.auth = {
-                            mode: 'token',
-                            token: process.env.OPENCLAW_GATEWAY_TOKEN
-                        };
+                        config.gateway.auth.token = process.env.OPENCLAW_GATEWAY_TOKEN;
                     }
                     
                     if (process.env.PRIMARY_MODEL) {
@@ -90,6 +105,8 @@ if [ -n "$SUPABASE_URL" ] && [ -n "$SUPABASE_SERVICE_ROLE_KEY" ]; then
                     }
                     
                     if (process.env.TELEGRAM_BOT_TOKEN) {
+                        config.channels = config.channels || {};
+                        config.channels.telegram = config.channels.telegram || {};
                         config.channels.telegram.botToken = process.env.TELEGRAM_BOT_TOKEN;
                     }
                     
