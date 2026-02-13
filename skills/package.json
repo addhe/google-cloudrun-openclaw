@@ -1,0 +1,1 @@
+{"name": "openclaw-supabase-skills", "version": "1.0.0", "description": "OpenClaw skills for Supabase configuration management", "main": "supabase-config-manager.js", "dependencies": {"undici": "^6.0.0"}, "keywords": ["openclaw", "supabase", "configuration", "bot"], "author": "OpenClaw", "license": "MIT"}

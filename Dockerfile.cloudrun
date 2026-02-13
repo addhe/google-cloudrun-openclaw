@@ -71,6 +71,10 @@ COPY --from=builder /app/dist/control-ui ./ui/dist
 COPY --from=builder /app/docs ./docs
 # Copy extensions from builder (includes proper plugins)
 COPY --from=builder /app/extensions ./extensions
+# Copy skills directory
+COPY --from=builder /app/skills ./skills
+COPY skills/package.json ./skills/package.json
+COPY skills/supabase-config-manager.js ./skills/supabase-config-manager.js
 
 # Copy configuration and entrypoint scripts
 COPY config/openclaw.json ./config/openclaw.json
