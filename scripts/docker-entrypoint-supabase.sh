@@ -1,6 +1,11 @@
 #!/bin/bash
 set -e
 
+echo "🚀 DEBUG: Entry script started!"
+echo "🚀 DEBUG: Environment variables:"
+echo "🚀 DEBUG: SUPABASE_URL=${SUPABASE_URL}"
+echo "🚀 DEBUG: SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}"
+
 # Configuration
 CONFIG_DIR="/home/node/.openclaw"
 CONFIG_FILE="${CONFIG_DIR}/openclaw.json"
