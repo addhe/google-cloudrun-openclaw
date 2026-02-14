@@ -94,6 +94,13 @@ if [ -n "$SUPABASE_URL" ] && [ -n "$SUPABASE_SERVICE_ROLE_KEY" ]; then
                         dangerouslyDisableDeviceAuth: true
                     };
                     config.gateway.auth = config.gateway.auth || { mode: 'token' };
+                    
+                    // DEBUG: Log gateway structure
+                    console.log('✓ Gateway structure enforced:');
+                    console.log('  - mode:', config.gateway.mode);
+                    console.log('  - bind:', config.gateway.bind);
+                    console.log('  - port:', config.gateway.port);
+                    console.log('  - auth:', JSON.stringify(config.gateway.auth));
 
                     // Update dynamic values from environment
                     if (process.env.OPENCLAW_GATEWAY_TOKEN) {
