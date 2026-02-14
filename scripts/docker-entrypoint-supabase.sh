@@ -126,6 +126,9 @@ if [ -n "$SUPABASE_URL" ] && [ -n "$SUPABASE_SERVICE_ROLE_KEY" ]; then
                     fs.writeFileSync('${CONFIG_FILE}', JSON.stringify(config, null, 2));
                     console.log('✓ Configuration loaded from Supabase');
                     console.log('✓ Agent model: ' + config.agents.defaults.model.primary);
+                    console.log('✓ Gateway mode: ' + config.gateway.mode);
+                    console.log('✓ Gateway bind: ' + config.gateway.bind);
+                    console.log('✓ Gateway port: ' + config.gateway.port);
                     return;
                 }
             }
