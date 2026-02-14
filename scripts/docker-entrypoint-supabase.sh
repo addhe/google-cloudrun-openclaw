@@ -129,6 +129,8 @@ if [ -n "$SUPABASE_URL" ] && [ -n "$SUPABASE_SERVICE_ROLE_KEY" ]; then
                     console.log('✓ Gateway mode: ' + config.gateway.mode);
                     console.log('✓ Gateway bind: ' + config.gateway.bind);
                     console.log('✓ Gateway port: ' + config.gateway.port);
+                    console.log('✓ Config file written:');
+                    console.log(fs.readFileSync('${CONFIG_FILE}', 'utf8'));
                     return;
                 }
             }
