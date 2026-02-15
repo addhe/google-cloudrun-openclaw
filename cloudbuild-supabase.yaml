@@ -42,6 +42,7 @@ steps:
       - '--concurrency=1000'
       - '--max-instances=10'
       - '--min-instances=0'
+      - '--command=/app/docker-entrypoint-supabase.sh'
       - '--set-secrets=OPENAI_API_KEY=openai-api-key:latest,OPENCLAW_GATEWAY_TOKEN=openclaw-gateway-token:latest,TELEGRAM_BOT_TOKEN=telegram-bot-token:latest,SUPABASE_URL=supabase-url:latest,SUPABASE_SERVICE_ROLE_KEY=supabase-service-role-key:latest'
       - '--set-env-vars=PRIMARY_MODEL=openai/gpt-4o-mini,LOG_LEVEL=debug,NODE_ENV=production'
 
