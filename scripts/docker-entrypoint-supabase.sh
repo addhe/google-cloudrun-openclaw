@@ -96,6 +96,8 @@ if [ -n "$SUPABASE_URL" ] && [ -n "$SUPABASE_SERVICE_ROLE_KEY" ]; then
                         allowInsecureAuth: true,
                         dangerouslyDisableDeviceAuth: true
                     };
+                    // Remove unrecognized keys that cause config validation to fail
+                    if (config.gateway.controlUi) delete config.gateway.controlUi.commands;
                     config.gateway.auth = config.gateway.auth || { mode: 'token' };
                     
                     // DEBUG: Log gateway structure
