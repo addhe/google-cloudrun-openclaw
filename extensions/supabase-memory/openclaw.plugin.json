@@ -1,0 +1,8 @@
+{
+  "id": "supabase-memory",
+  "name": "Supabase Memory",
+  "version": "0.1.0",
+  "kind": "memory",
+  "main": "index.js",
+  "description": "Supabase-backed persistent memory plugin for OpenClaw"
+}
