@@ -82,10 +82,8 @@ if [ -n "$SUPABASE_URL" ] && [ -n "$SUPABASE_SERVICE_ROLE_KEY" ]; then
                     const config = data[0].value;
                     const fs = require('fs');
                     
-                    // Enforce Cloud Run gateway shape
+                    // Ensure gateway structure exists
                     config.gateway = config.gateway || {};
-                    config.gateway.mode = 'production';
-                    config.gateway.bind = '0.0.0.0';
                     config.gateway.port = parseInt(process.env.PORT || '8080');
                     config.gateway.trustedProxies = config.gateway.trustedProxies || [
                         'loopback',
@@ -135,7 +133,7 @@ if [ -n "$SUPABASE_URL" ] && [ -n "$SUPABASE_SERVICE_ROLE_KEY" ]; then
                         }
                     };
 
-                    fs.writeFileSync('${CONFIG_FILE}', JSON.stringify(config, null, 2));
+                    fs.writeFileSync("${CONFIG_FILE}", JSON.stringify(config, null, 2));
                     console.log('✓ Configuration loaded from Supabase');
                     console.log('✓ Agent model: ' + config.agents.defaults.model.primary);
                     console.log('✓ Gateway mode: ' + config.gateway.mode);
@@ -159,7 +157,7 @@ if [ -n "$SUPABASE_URL" ] && [ -n "$SUPABASE_SERVICE_ROLE_KEY" ]; then
                     model: {
                         primary: process.env.PRIMARY_MODEL || 'openai/gpt-4o-mini'
                     },
-                    workspace: '${CONFIG_DIR}/workspace'
+                    workspace: "${CONFIG_DIR}/workspace"
                 }
             },
             gateway: {
@@ -229,7 +227,7 @@ if [ -n "$SUPABASE_URL" ] && [ -n "$SUPABASE_SERVICE_ROLE_KEY" ]; then
             config.agents.defaults.model.primary = process.env.PRIMARY_MODEL;
         }
         
-        fs.writeFileSync('${CONFIG_FILE}', JSON.stringify(config, null, 2));
+        fs.writeFileSync("${CONFIG_FILE}", JSON.stringify(config, null, 2));
         console.log('✓ Configuration generated');
         console.log('✓ Agent model: ' + config.agents.defaults.model.primary);
     }
@@ -245,8 +243,8 @@ else
     
     // Try to load existing config first, otherwise generate new one
     let config;
-    if (fs.existsSync('${CONFIG_FILE}')) {
-        config = JSON.parse(fs.readFileSync('${CONFIG_FILE}', 'utf8'));
+    if (fs.existsSync("${CONFIG_FILE}")) {
+        config = JSON.parse(fs.readFileSync("${CONFIG_FILE}", 'utf8'));
         console.log('✓ Using existing config file');
     } else {
         config = {
@@ -256,7 +254,7 @@ else
                     model: {
                         primary: process.env.PRIMARY_MODEL || 'openai/gpt-4o-mini'
                     },
-                    workspace: '${CONFIG_DIR}/workspace'
+                    workspace: "${CONFIG_DIR}/workspace"
                 }
             },
             gateway: {
@@ -327,7 +325,7 @@ else
         config.agents.defaults.model.primary = process.env.PRIMARY_MODEL;
     }
     
-    fs.writeFileSync('${CONFIG_FILE}', JSON.stringify(config, null, 2));
+    fs.writeFileSync("${CONFIG_FILE}", JSON.stringify(config, null, 2));
     console.log('✓ Config updated');
     console.log('✓ Agent model: ' + config.agents.defaults.model.primary);
 "
