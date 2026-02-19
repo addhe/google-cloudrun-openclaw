@@ -7,9 +7,9 @@ echo "🚀 DEBUG: SUPABASE_URL=${SUPABASE_URL}"
 echo "🚀 DEBUG: SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}"
 
 # Configuration
-CONFIG_DIR="/home/node/.openclaw"
-CONFIG_FILE="${CONFIG_DIR}/openclaw.json"
-AUTH_FILE="${CONFIG_DIR}/agents/main/agent/auth-profiles.json"
+export CONFIG_DIR="/home/node/.openclaw"
+export CONFIG_FILE="${CONFIG_DIR}/openclaw.json"
+export AUTH_FILE="${CONFIG_DIR}/agents/main/agent/auth-profiles.json"
 
 echo "🚀 OpenClaw Startup with Supabase Integration"
 echo "=========================================="
@@ -133,14 +133,14 @@ if [ -n "$SUPABASE_URL" ] && [ -n "$SUPABASE_SERVICE_ROLE_KEY" ]; then
                         }
                     };
 
-                    fs.writeFileSync("${CONFIG_FILE}", JSON.stringify(config, null, 2));
+                    fs.writeFileSync(process.env.CONFIG_FILE, JSON.stringify(config, null, 2));
                     console.log('✓ Configuration loaded from Supabase');
                     console.log('✓ Agent model: ' + config.agents.defaults.model.primary);
                     console.log('✓ Gateway mode: ' + config.gateway.mode);
                     console.log('✓ Gateway bind: ' + config.gateway.bind);
                     console.log('✓ Gateway port: ' + config.gateway.port);
                     console.log('✓ Config file written:');
-                    console.log(fs.readFileSync('${CONFIG_FILE}', 'utf8'));
+                    console.log(fs.readFileSync(process.env.CONFIG_FILE, 'utf8'));
                     return;
                 }
             }
@@ -157,7 +157,7 @@ if [ -n "$SUPABASE_URL" ] && [ -n "$SUPABASE_SERVICE_ROLE_KEY" ]; then
                     model: {
                         primary: process.env.PRIMARY_MODEL || 'openai/gpt-4o-mini'
                     },
-                    workspace: "${CONFIG_DIR}/workspace"
+                    workspace: process.env.CONFIG_DIR + '/workspace'
                 }
             },
             gateway: {
@@ -227,7 +227,7 @@ if [ -n "$SUPABASE_URL" ] && [ -n "$SUPABASE_SERVICE_ROLE_KEY" ]; then
             config.agents.defaults.model.primary = process.env.PRIMARY_MODEL;
         }
         
-        fs.writeFileSync("${CONFIG_FILE}", JSON.stringify(config, null, 2));
+        fs.writeFileSync(process.env.CONFIG_FILE, JSON.stringify(config, null, 2));
         console.log('✓ Configuration generated');
         console.log('✓ Agent model: ' + config.agents.defaults.model.primary);
     }
@@ -243,8 +243,8 @@ else
     
     // Try to load existing config first, otherwise generate new one
     let config;
-    if (fs.existsSync("${CONFIG_FILE}")) {
-        config = JSON.parse(fs.readFileSync("${CONFIG_FILE}", 'utf8'));
+    if (fs.existsSync(process.env.CONFIG_FILE)) {
+        config = JSON.parse(fs.readFileSync(process.env.CONFIG_FILE, 'utf8'));
         console.log('✓ Using existing config file');
     } else {
         config = {
@@ -254,7 +254,7 @@ else
                     model: {
                         primary: process.env.PRIMARY_MODEL || 'openai/gpt-4o-mini'
                     },
-                    workspace: "${CONFIG_DIR}/workspace"
+                    workspace: process.env.CONFIG_DIR + '/workspace'
                 }
             },
             gateway: {
@@ -325,7 +325,7 @@ else
         config.agents.defaults.model.primary = process.env.PRIMARY_MODEL;
     }
     
-    fs.writeFileSync("${CONFIG_FILE}", JSON.stringify(config, null, 2));
+    fs.writeFileSync(process.env.CONFIG_FILE, JSON.stringify(config, null, 2));
     console.log('✓ Config updated');
     console.log('✓ Agent model: ' + config.agents.defaults.model.primary);
 "
