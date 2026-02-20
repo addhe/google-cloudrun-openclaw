@@ -4,5 +4,17 @@
   "version": "0.1.0",
   "kind": "memory",
   "main": "index.js",
-  "description": "Supabase-backed persistent memory plugin for OpenClaw"
+  "description": "Supabase-backed persistent memory plugin for OpenClaw",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": true,
+    "properties": {
+      "supabaseUrl": {
+        "type": "string"
+      },
+      "supabaseKey": {
+        "type": "string"
+      }
+    }
+  }
 }
