@@ -164,7 +164,7 @@ if [ -n "$SUPABASE_URL" ] && [ -n "$SUPABASE_SERVICE_ROLE_KEY" ]; then
             },
             gateway: {
                 mode: 'production',
-                bind: '0.0.0.0',
+                bind: 'lan',
                 port: parseInt(process.env.PORT || '8080'),
                 trustedProxies: ['loopback', '127.0.0.1', '0.0.0.0/0', '172.17.0.1'],
                 controlUi: {
@@ -261,7 +261,7 @@ else
             },
             gateway: {
                 mode: 'production',
-                bind: '0.0.0.0',
+                bind: 'lan',
                 port: parseInt(process.env.PORT || '8080'),
                 trustedProxies: ['loopback', '127.0.0.1', '0.0.0.0/0', '172.17.0.1'],
                 controlUi: {
