@@ -44,7 +44,7 @@ steps:
       - '--min-instances=0'
       - '--command=/app/docker-entrypoint-supabase.sh'
       - '--set-secrets=OPENAI_API_KEY=openai-api-key:latest,GOOGLE_API_KEY=gemini-api-key:latest,OPENCLAW_GATEWAY_TOKEN=openclaw-gateway-token:latest,TELEGRAM_BOT_TOKEN=telegram-bot-token:latest,SUPABASE_URL=supabase-url:latest,SUPABASE_SERVICE_ROLE_KEY=supabase-service-role-key:latest'
-      - '--set-env-vars=PRIMARY_MODEL=google/gemini-1.5-flash,LOG_LEVEL=debug,NODE_ENV=production'
+      - '--set-env-vars=PRIMARY_MODEL=google/gemini-2.0-flash-exp,LOG_LEVEL=debug,NODE_ENV=production'
 
 images:
   - 'us-central1-docker.pkg.dev/$PROJECT_ID/openclaw-repo/openclaw-supabase'
